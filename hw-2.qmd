@@ -1,0 +1,64 @@
+---
+title: "hw-2_hamoodi-a_400333494"
+format: pdf
+editor: source
+---
+
+# Part A
+
+## Question 1
+Assuming the csv file is in the same folder as the project file.
+
+```{r}
+lordOfRings <- readr::read_csv("./lord-of-the-rings-trilogy.csv")
+```
+
+## Question 2
+The column names don't follow a standard naming convention (e.g. Hobbit is capitalized in some columns and not in others). Exhaustively: Hobbit_female should be hobbit_female, hobbit_Male should be hobbit_male, man_Female should be man_female, and Man_male should be man_male
+
+## Question 3
+We would have 7 columns and 3 rows if the dataset was tidy. I don't think we need to increase the number of rows as each row would no longer be a single observation. Additionally, we would lose information if we combined columns (e.g. hobbit = Hobbit_female + hobbit_Male)
+
+## Question 4
+The column names would be: movie, elf_female, elf_male, hobbit_female, hobbit_male, man_female, man_male
+
+
+# Part B
+## Question 1
+```{r}
+lordOfRings <- dplyr::rename(lordOfRings, hobbit_female = Hobbit_female)
+lordOfRings <- dplyr::rename(lordOfRings, hobbit_male = hobbit_Male)
+lordOfRings <- dplyr::rename(lordOfRings, man_female = man_Female)
+lordOfRings <- dplyr::rename(lordOfRings, man_male = Man_male)
+```
+
+## Question 2
+a) Male hobbits: 8780 words
+```{r}
+maleHobbits <- sum(lordOfRings$hobbit_male)
+```
+
+b) Female elves: 1743 words
+```{r}
+femaleElves <- sum(lordOfRings$elf_female)
+```
+
+c) Male elves: 1994 words
+```{r}
+maleElves <- sum(lordOfRings$elf_male)
+```
+
+## Question 3
+```{r}
+# Create new table with columns for words spoken by each race
+lordOfRingsRace <- dplyr::mutate(lordOfRings, elf = elf_female + elf_male)
+lordOfRingsRace <- dplyr::mutate(lordOfRingsRace, hobbit = hobbit_female + hobbit_male)
+lordOfRingsRace <- dplyr::mutate(lordOfRingsRace, man = man_female + man_male)
+lordOfRingsRace <- dplyr::select(lordOfRingsRace, c(movie, elf, hobbit, man))
+
+lordOfRingsRace
+```
+No race dominates words spoken across all movies, the dominant race depends on the movie. So in a single movie, a race dominates words spoken.
+
+## Question 4
+Yes. In the fellowship of the ring, hobbits dominated. In the two towers, man dominated. In the return of the king, man dominated.

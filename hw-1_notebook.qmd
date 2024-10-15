@@ -1,0 +1,137 @@
+---
+title: "Homework assignment 1"
+author: "Ameer Hamoodi"
+format: pdf
+---
+
+## Question 1
+I installed the babynames package by running `install.packages("babynames")`
+```{r}
+library(babynames)
+```
+
+## Question 2
+
+
+```{r}
+numberOfVars <- ncol(babynames::babynames)
+numberOfObservations <- nrow(babynames::babynames)
+```
+
+There are 5 variables and 1924665 observations.
+
+## Question 3
+
+```{r}
+babyTibble <- tibble::tribble(
+  ~name, ~data_type, ~description,
+  "Year", "Number", "Year of this baby name",
+  "Sex", "Male or Female", "The sex of this baby name",
+  "Name", "String", "The name of the baby",
+  "N", "Number", "Number of babys with this name",
+  "Prop", "Number", "Proportion of people 
+  with this name and sex born in the year of this row"
+)
+```
+
+
+## Question 4
+```{r}
+maxYear <- max(babynames::babynames$year)
+minYear <- min(babynames::babynames$year)
+range <- paste("Range is", minYear, "to", maxYear, sep=" ")
+range
+```
+The range of years is from 1880 to 2017
+
+
+## Question 5
+```{r}
+babynames_n <- dplyr::select(babynames, -("n")) 
+# Creates a new array with no "n" column
+```
+
+## Question 6
+Since n represents the number of babies born with a given name in a given year and the number of babies born
+likely grows over time, we would need a relative measure of the number of babies with a given name to control
+for the change in babies born / year. So we can keep prop and remove n.
+
+## Question 7
+```{r}
+secondMil <- dplyr::filter(babynames_n, year < 2000)
+secondMilMale <- dplyr::filter(secondMil, sex == "M")
+secondMilFemale <- dplyr::filter(secondMil, sex == "F")
+
+thirdMil <- dplyr::filter(babynames_n, year >= 2000)
+thirdMilMale <- dplyr::filter(thirdMil,sex == "M")
+thirdMilFemale <- dplyr::filter(thirdMil,sex == "F")
+
+topNameSecondMilMale <- dplyr::arrange(secondMilMale)$name[1]
+topNameSecondMilFemale <- dplyr::arrange(secondMilFemale)$name[1]
+
+topNameThirdMilMale <- dplyr::arrange(thirdMilMale)$name[1]
+topNameThirdMilFemale <- dplyr::arrange(thirdMilFemale)$name[1]
+```
+
+a) The most popular names (female, male) in the second millennium were (Mary, John) 
+
+b) The most popular names (female, male) in the third millennium were (Emily, Jacob). 
+
+## Question 8
+```{r}
+twoToTwelve <- dplyr::filter(babynames_n, year >= 2000 & year <= 2012)
+qvx <- dplyr::filter(twoToTwelve, stringr::str_detect(name, "^Q") 
+                     | stringr::str_detect(name, "^V") 
+                     | stringr::str_detect(name, "^X"))
+
+popQvx <- dplyr::arrange(qvx, desc(prop))$name[1]
+popQvx
+```
+Victoria was the most popular name between 2000 and 2012 starting with Q, V, or X.
+
+
+## Question 9
+```{r}
+decadeBased <- tibble::tibble(babynames::babynames)
+decadeBased <- dplyr::select(decadeBased, year:prop)
+decadeBased <- dplyr::mutate(decadeBased, decade = year %/% 10 + 1) 
+# contains a column called decade
+```
+
+## Question 10
+```{r}
+femaleOnly <- dplyr::filter(decadeBased, sex=="F")
+maleOnly <- dplyr::filter(decadeBased, sex=="M")
+
+groupFemale <- dplyr::group_by(femaleOnly, decade)
+groupMale <- dplyr::group_by(maleOnly, decade)
+```
+
+Average born females per decade:
+```{r}
+dplyr::summarize(groupFemale, meanBabiesBorn=sum(n)/10)
+```
+
+Average number of male babies born per decade
+```{r}
+dplyr::summarize(groupMale, meanBabiesBorn=sum(n)/10)
+```
+
+## Question 11
+```{r}
+myName <- dplyr::filter(decadeBased, name == "Ameer")
+myName <- dplyr::arrange(myName, desc(prop))
+
+supervisorName <- dplyr::filter(decadeBased, name=="Aimee")
+supervisorName <- dplyr::arrange(supervisorName, desc(prop))
+
+jack <- dplyr::filter(decadeBased, name=="Jack")
+jack <- dplyr::arrange(jack, desc(prop))
+
+scott <- dplyr::filter(decadeBased, name=="Scott")
+scott <- dplyr::arrange(scott, desc(prop))
+```
+
+a) My name was most popular in the 202nd decade in the year 2017
+b) My supervisor's name was most popular in the 198th decade in the year 1973
+c) Scott's name was most popular in the 198th decade in the year 1971 and Jack's name was most popular in the 193rd decade in the year 1927
